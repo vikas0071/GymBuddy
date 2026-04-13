@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import androidx.compose.ui.res.painterResource
 import com.vgroups.gymbuddy.domain.model.Exercise
+import com.vgroups.gymbuddy.presentation.components.ExerciseDetailSheet
 import com.vgroups.gymbuddy.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -163,7 +165,7 @@ private fun ExerciseRow(exercise: Exercise, onClick: () -> Unit) {
                     contentDescription = exercise.name,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    error = androidx.compose.ui.res.painterResource(android.R.drawable.stat_notify_error),
+                    error = painterResource(android.R.drawable.stat_notify_error),
                     alpha = 0.8f
                 )
             }
@@ -189,99 +191,6 @@ private fun ExerciseRow(exercise: Exercise, onClick: () -> Unit) {
                     style = MaterialTheme.typography.labelMedium.copy(color = Accent)
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun ExerciseDetailSheet(exercise: Exercise) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 32.dp)
-    ) {
-        // Full-width image
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(exercise.imageUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = exercise.name,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp)
-                .background(SurfaceVariant),
-            contentScale = ContentScale.Fit,
-            error = androidx.compose.ui.res.painterResource(android.R.drawable.ic_dialog_info)
-        )
-        Column(modifier = Modifier.padding(20.dp)) {
-            Text(
-                text = exercise.name,
-                style = MaterialTheme.typography.headlineSmall.copy(color = TextPrimary)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            // Muscle chips
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                MuscleChip(exercise.primaryMuscle, isPrimary = true)
-                exercise.secondaryMuscles.forEach { MuscleChip(it, isPrimary = false) }
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            // Meta row
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                InfoChip("Equipment", exercise.equipment)
-                InfoChip("Level", exercise.level)
-                InfoChip("Sets×Reps", "${exercise.sets}×${exercise.reps}")
-            }
-            Spacer(modifier = Modifier.height(18.dp))
-            Text(
-                text = "Instructions",
-                style = MaterialTheme.typography.titleSmall.copy(color = TextPrimary, fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            exercise.instructions.forEachIndexed { i, step ->
-                Row(modifier = Modifier.padding(bottom = 8.dp)) {
-                    Text(
-                        text = "${i + 1}.",
-                        style = MaterialTheme.typography.bodySmall.copy(color = Accent),
-                        modifier = Modifier.width(24.dp)
-                    )
-                    Text(
-                        text = step,
-                        style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MuscleChip(label: String, isPrimary: Boolean) {
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = if (isPrimary) Accent.copy(alpha = 0.2f) else SurfaceVariant
-    ) {
-        Text(
-            text = label.replaceFirstChar { it.uppercase() },
-            style = MaterialTheme.typography.labelSmall.copy(
-                color = if (isPrimary) Accent else TextSecondary,
-                fontWeight = if (isPrimary) FontWeight.SemiBold else FontWeight.Normal
-            ),
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-        )
-    }
-}
-
-@Composable
-private fun InfoChip(label: String, value: String) {
-    Surface(shape = RoundedCornerShape(8.dp), color = SurfaceVariant) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-        ) {
-            Text(text = label, style = MaterialTheme.typography.labelSmall.copy(color = TextMuted))
-            Text(text = value, style = MaterialTheme.typography.labelMedium.copy(color = TextPrimary, fontWeight = FontWeight.SemiBold))
         }
     }
 }

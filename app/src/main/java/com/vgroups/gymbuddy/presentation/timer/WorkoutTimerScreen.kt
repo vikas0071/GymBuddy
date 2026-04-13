@@ -18,18 +18,24 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.vgroups.gymbuddy.presentation.components.ExerciseDetailSheet
 import com.vgroups.gymbuddy.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutTimerScreen(
     onWorkoutComplete: (splitId: String, dayIndex: Int, durationSeconds: Long, exerciseCount: Int, splitName: String, dayLabel: String) -> Unit,
     viewModel: TimerViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSheet by remember { mutableStateOf(false) }
 
     // Trigger celebration navigation when workout finishes
     LaunchedEffect(uiState.workoutComplete) {
@@ -114,17 +120,34 @@ fun WorkoutTimerScreen(
                             .padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Exercise name
-                        Text(
-                            text = exercise?.name ?: "Loading…",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = exercise?.name ?: "Loading…",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary,
+                                    textAlign = TextAlign.Center
+                                ),
+                                modifier = Modifier.weight(1f, fill = false),
                                 textAlign = TextAlign.Center
-                            ),
-                            textAlign = TextAlign.Center
-                        )
+                            )
+                            IconButton(
+                                onClick = { showSheet = true },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = "Instruction",
+                                    tint = Accent,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = exercise?.primaryMuscle ?: "",
@@ -336,6 +359,21 @@ fun WorkoutTimerScreen(
                 style = MaterialTheme.typography.labelSmall.copy(color = TextMuted)
             )
             Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+
+    // Detail Sheet overlay
+    if (showSheet && uiState.exercises.isNotEmpty()) {
+        val currentEx = uiState.exercises.getOrNull(uiState.currentExerciseIndex)
+        if (currentEx != null) {
+            ModalBottomSheet(
+                onDismissRequest = { showSheet = false },
+                sheetState = sheetState,
+                containerColor = Surface,
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            ) {
+                ExerciseDetailSheet(exercise = currentEx)
+            }
         }
     }
 }
