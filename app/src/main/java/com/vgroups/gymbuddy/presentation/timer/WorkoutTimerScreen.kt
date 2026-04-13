@@ -16,6 +16,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.vgroups.gymbuddy.ui.theme.*
 
 @Composable
@@ -126,6 +132,24 @@ fun WorkoutTimerScreen(
                         )
                         Spacer(modifier = Modifier.height(20.dp))
 
+                        // Exercise image
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(exercise?.imageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = exercise?.name,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .background(SurfaceVariant)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Fit,
+                            error = painterResource(android.R.drawable.ic_dialog_info)
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
                         // Set counter
                         Surface(
                             shape = RoundedCornerShape(8.dp),
@@ -140,9 +164,9 @@ fun WorkoutTimerScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        // Active set timer (counts UP) — hidden during rest
+                        // Active set timer (counts UP) — hidden during rest or prep
                         AnimatedVisibility(
-                            visible = !uiState.isResting,
+                            visible = !uiState.isResting && !uiState.isPreparing,
                             enter = fadeIn(),
                             exit = fadeOut()
                         ) {
@@ -160,6 +184,38 @@ fun WorkoutTimerScreen(
                                 Text(
                                     text = "Target: ${exercise?.reps ?: "–"} reps",
                                     style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
+                                )
+                            }
+                        }
+
+                        // PREPARATION Countdown — shown during prep
+                        AnimatedVisibility(
+                            visible = uiState.isPreparing,
+                            enter = fadeIn() + scaleIn(),
+                            exit = fadeOut() + scaleOut()
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "GET READY",
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        color = Accent,
+                                        letterSpacing = 5.sp
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = uiState.prepSecondsLeft.toString(),
+                                    style = MaterialTheme.typography.displayMedium.copy(
+                                        fontFamily = FontFamily.Monospace,
+                                        fontSize = 72.sp,
+                                        color = Accent,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Preparation",
+                                    style = MaterialTheme.typography.bodySmall.copy(color = TextMuted)
                                 )
                             }
                         }
@@ -203,44 +259,71 @@ fun WorkoutTimerScreen(
 
             // ── Action buttons ───────────────────────────────────────────
             AnimatedContent(
-                targetState = uiState.isResting,
+                targetState = when {
+                    uiState.isPreparing -> "prep"
+                    uiState.isResting -> "rest"
+                    else -> "active"
+                },
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
                 label = "button_switch"
-            ) { isResting ->
-                if (!isResting) {
-                    Button(
-                        onClick = { viewModel.onSetDone() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Accent)
-                    ) {
-                        Text(
-                            text = "Set Done  ✓",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                color = Color.White,
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold
+            ) { state ->
+                when (state) {
+                    "active" -> {
+                        Button(
+                            onClick = { viewModel.onSetDone() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Accent)
+                        ) {
+                            Text(
+                                text = "Set Done  ✓",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    color = Color.White,
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
+                        }
                     }
-                } else {
-                    OutlinedButton(
-                        onClick = { viewModel.onSkipRest() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Divider)
-                    ) {
-                        Text(
-                            text = "Skip Rest  ⏭",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                color = TextSecondary,
-                                fontSize = 17.sp
+                    "rest" -> {
+                        OutlinedButton(
+                            onClick = { viewModel.onSkipRest() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Divider)
+                        ) {
+                            Text(
+                                text = "Skip Rest  ⏭",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    color = TextSecondary,
+                                    fontSize = 17.sp
+                                )
                             )
-                        )
+                        }
+                    }
+                    "prep" -> {
+                        // Optional: Allow skipping prep? Usually better to just show it
+                        Button(
+                            onClick = { /* skip prep? */ },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = SurfaceVariant),
+                            enabled = false
+                        ) {
+                            Text(
+                                text = "Prepare...",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    color = TextMuted,
+                                    fontSize = 17.sp
+                                )
+                            )
+                        }
                     }
                 }
             }

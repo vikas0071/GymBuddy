@@ -162,7 +162,9 @@ private fun ExerciseRow(exercise: Exercise, onClick: () -> Unit) {
                         .build(),
                     contentDescription = exercise.name,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    error = androidx.compose.ui.res.painterResource(android.R.drawable.stat_notify_error),
+                    alpha = 0.8f
                 )
             }
             Spacer(modifier = Modifier.width(14.dp))
@@ -210,7 +212,8 @@ private fun ExerciseDetailSheet(exercise: Exercise) {
                 .fillMaxWidth()
                 .height(220.dp)
                 .background(SurfaceVariant),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            error = androidx.compose.ui.res.painterResource(android.R.drawable.ic_dialog_info)
         )
         Column(modifier = Modifier.padding(20.dp)) {
             Text(

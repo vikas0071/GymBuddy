@@ -20,11 +20,12 @@ data class ExerciseDto(
     @SerializedName("images") val images: List<String>
 ) {
     /** Build URL for first image using the raw GitHub CDN */
+    /** Build URL for the primary exercise image using the raw GitHub CDN */
     fun imageUrl(): String {
         return if (images.isNotEmpty()) {
             "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${images[0]}"
         } else {
-            ""
+            "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/$id/0.jpg"
         }
     }
 }
