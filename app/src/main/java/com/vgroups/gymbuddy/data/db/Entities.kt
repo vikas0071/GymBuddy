@@ -15,6 +15,7 @@ data class WorkoutHistoryEntity(
     val splitId: String,
     val splitName: String,
     val dayLabel: String,
+    val dayIndex: Int,
     val totalExercises: Int,
     val durationSeconds: Long,
     val completedAt: Long

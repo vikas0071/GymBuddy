@@ -192,6 +192,7 @@ class TimerViewModel @Inject constructor(
             repository.saveWorkoutSession(
                 WorkoutSession(
                     splitId = splitId,
+                    dayIndex = dayIndex,
                     splitName = split.name,
                     dayLabel = workoutDay.label,
                     totalExercises = _uiState.value.exercises.size,

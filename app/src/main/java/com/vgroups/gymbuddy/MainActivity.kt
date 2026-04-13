@@ -15,6 +15,7 @@ import com.vgroups.gymbuddy.presentation.celebration.CelebrationScreen
 import com.vgroups.gymbuddy.presentation.exercises.ExerciseListScreen
 import com.vgroups.gymbuddy.presentation.home.HomeScreen
 import com.vgroups.gymbuddy.presentation.timer.WorkoutTimerScreen
+import com.vgroups.gymbuddy.presentation.settings.SettingsScreen
 import com.vgroups.gymbuddy.ui.theme.GymBuddyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,8 +51,15 @@ private fun GymBuddyNavGraph() {
             HomeScreen(
                 onSplitClick = { splitId, dayIndex ->
                     navController.navigate("exercises/$splitId/$dayIndex")
+                },
+                onSettingsClick = {
+                    navController.navigate("settings")
                 }
             )
+        }
+        
+        composable("settings") {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
 
         // ── Screen 2: Exercise List ──────────────────────────────────────
@@ -84,25 +92,27 @@ private fun GymBuddyNavGraph() {
                     val encodedDay = java.net.URLEncoder.encode(dayLabel, "UTF-8")
                     val encodedSplit = java.net.URLEncoder.encode(splitName, "UTF-8")
                     navController.navigate(
-                        "celebration/$encodedSplit/$encodedDay/$durationSeconds/$exerciseCount"
+                        "celebration/$splitId/$dayIndex/$encodedSplit/$encodedDay/$durationSeconds/$exerciseCount"
                     ) {
-                        // Remove timer + exercise list from back stack
                         popUpTo("home") { inclusive = false }
                     }
                 }
             )
         }
-
         // ── Screen 4: Celebration ────────────────────────────────────────
         composable(
-            route = "celebration/{splitName}/{dayLabel}/{durationSeconds}/{exerciseCount}",
+            route = "celebration/{splitId}/{dayIndex}/{splitName}/{dayLabel}/{durationSeconds}/{exerciseCount}",
             arguments = listOf(
+                navArgument("splitId") { type = NavType.StringType },
+                navArgument("dayIndex") { type = NavType.IntType },
                 navArgument("splitName") { type = NavType.StringType },
                 navArgument("dayLabel") { type = NavType.StringType },
                 navArgument("durationSeconds") { type = NavType.LongType },
                 navArgument("exerciseCount") { type = NavType.IntType }
             )
         ) { backStack ->
+            val splitId = backStack.arguments?.getString("splitId") ?: ""
+            val dayIndex = backStack.arguments?.getInt("dayIndex") ?: 0
             val splitName = java.net.URLDecoder.decode(
                 backStack.arguments?.getString("splitName") ?: "", "UTF-8"
             )
@@ -113,6 +123,8 @@ private fun GymBuddyNavGraph() {
             val exerciseCount = backStack.arguments?.getInt("exerciseCount") ?: 0
 
             CelebrationScreen(
+                splitId = splitId,
+                dayIndex = dayIndex,
                 durationSeconds = duration,
                 exerciseCount = exerciseCount,
                 splitName = splitName,

@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vgroups.gymbuddy.ui.theme.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -35,13 +36,28 @@ private data class Particle(
 
 @Composable
 fun CelebrationScreen(
+    splitId: String,
+    dayIndex: Int,
     durationSeconds: Long,
     exerciseCount: Int,
     splitName: String,
     dayLabel: String,
-    onBackHome: () -> Unit
+    onBackHome: () -> Unit,
+    viewModel: CelebrationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    // Automatically save workout on entry
+    LaunchedEffect(Unit) {
+        viewModel.saveWorkout(
+            splitId = splitId,
+            dayIndex = dayIndex,
+            splitName = splitName,
+            dayLabel = dayLabel,
+            exerciseCount = exerciseCount,
+            durationSeconds = durationSeconds
+        )
+    }
 
     // ── Confetti particle system ──────────────────────────────────────────────
     val particles = remember {

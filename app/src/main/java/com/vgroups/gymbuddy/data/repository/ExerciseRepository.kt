@@ -77,6 +77,7 @@ class ExerciseRepository @Inject constructor(
         historyDao.insertSession(
             WorkoutHistoryEntity(
                 splitId = session.splitId,
+                dayIndex = session.dayIndex,
                 splitName = session.splitName,
                 dayLabel = session.dayLabel,
                 totalExercises = session.totalExercises,

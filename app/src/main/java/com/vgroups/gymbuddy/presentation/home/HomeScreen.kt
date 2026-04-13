@@ -2,6 +2,7 @@ package com.vgroups.gymbuddy.presentation.home
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,9 +32,11 @@ import com.vgroups.gymbuddy.ui.theme.*
 @Composable
 fun HomeScreen(
     onSplitClick: (splitId: String, dayIndex: Int) -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val lastSplitId by viewModel.lastSplitId.collectAsState()
+    val suggestion by viewModel.suggestion.collectAsState()
 
     Scaffold(
         containerColor = Background,
@@ -58,7 +61,7 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onSettingsClick) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "Settings",
@@ -81,8 +84,15 @@ fun HomeScreen(
             contentPadding = PaddingValues(bottom = 24.dp, top = 8.dp)
         ) {
             item {
+                if (suggestion != null) {
+                    SuggestionCard(
+                        suggestion = suggestion!!,
+                        onClick = { onSplitClick(suggestion!!.split.id, suggestion!!.dayIndex) }
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
                 Text(
-                    text = "Choose your split",
+                    text = "Workout Splits",
                     style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary),
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -210,5 +220,65 @@ private fun DifficultyBadge(difficulty: Difficulty) {
             ),
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
         )
+    }
+}
+
+@Composable
+private fun SuggestionCard(
+    suggestion: WorkoutSuggestion,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Accent.copy(alpha = 0.15f)),
+        border = BorderStroke(1.5.dp, Accent.copy(alpha = 0.3f))
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Accent
+                ) {
+                    Text(
+                        text = "UP NEXT",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "Today's Target",
+                    style = MaterialTheme.typography.labelMedium.copy(color = TextSecondary)
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = suggestion.day.label,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    color = TextPrimary,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
+            Text(
+                text = suggestion.split.name,
+                style = MaterialTheme.typography.bodyMedium.copy(color = Accent)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onClick,
+                colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.height(44.dp)
+            ) {
+                Text("Start Now  →", fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.vgroups.gymbuddy.domain.model
 
 data class WorkoutSession(
     val splitId: String,
+    val dayIndex: Int,
     val splitName: String,
     val dayLabel: String,
     val totalExercises: Int,
