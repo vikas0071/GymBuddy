@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.vgroups.gymbuddy.presentation.celebration.CelebrationScreen
 import com.vgroups.gymbuddy.presentation.exercises.ExerciseListScreen
 import com.vgroups.gymbuddy.presentation.home.HomeScreen
@@ -20,6 +21,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        val startTime = System.currentTimeMillis()
+        splashScreen.setKeepOnScreenCondition {
+            System.currentTimeMillis() - startTime < 1200L
+        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {

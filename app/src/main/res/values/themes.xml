@@ -9,4 +9,11 @@
         <item name="android:navigationBarColor">@color/gym_background</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
+
+    <!-- Splash Screen Theme -->
+    <style name="Theme.GymBuddy.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/gym_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.GymBuddy</item>
+    </style>
 </resources>
