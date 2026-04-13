@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 
+        Android 12+ (API 31+) Specific Splash Screen Theme.
+        Modern Android versions require explicit 'android:' prefixes for splash attributes.
+    -->
+    <style name="Theme.GymBuddy.Splash" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">@color/gym_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.GymBuddy</item>
+    </style>
+</resources>
