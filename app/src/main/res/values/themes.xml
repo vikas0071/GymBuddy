@@ -1,0 +1,12 @@
+<resources>
+    <!--
+        Minimal XML theme used only for the activity window chrome (background color, status bar).
+        All actual Material3 + Compose theming is applied in Kotlin via GymBuddyTheme.
+        Theme.DeviceDefault.NoActionBar is always present on every Android device/emulator.
+    -->
+    <style name="Theme.GymBuddy" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/gym_background</item>
+        <item name="android:navigationBarColor">@color/gym_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

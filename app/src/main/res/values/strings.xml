@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">GymBuddy</string>
+    <string name="split_selector_title">Choose your split</string>
+    <string name="start_workout">Start Workout</string>
+    <string name="set_done">Set Done</string>
+    <string name="skip_rest">Skip Rest</string>
+    <string name="workout_complete">Workout Complete!</string>
+    <string name="back_to_home">Back to Home</string>
+    <string name="share_workout">Share Workout</string>
+    <string name="duration_label">Duration</string>
+    <string name="exercises_label">Exercises</string>
+    <string name="rest_label">REST</string>
+    <string name="instructions_label">Instructions</string>
+    <string name="equipment_label">Equipment</string>
+    <string name="level_label">Level</string>
+</resources>
