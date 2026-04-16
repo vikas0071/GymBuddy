@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -232,19 +233,21 @@ private fun SuggestionCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .clickable(onClick = onClick),
+            .clickable(onClick = if (suggestion.isRestDay) ({}) else onClick),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Accent.copy(alpha = 0.15f)),
-        border = BorderStroke(1.5.dp, Accent.copy(alpha = 0.3f))
+        colors = CardDefaults.cardColors(
+            containerColor = if (suggestion.isRestDay) SurfaceVariant.copy(alpha = 0.5f) else Accent.copy(alpha = 0.15f)
+        ),
+        border = BorderStroke(1.5.dp, if (suggestion.isRestDay) Divider else Accent.copy(alpha = 0.3f))
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = Accent
+                    color = if (suggestion.isRestDay) TextSecondary else Accent
                 ) {
                     Text(
-                        text = "UP NEXT",
+                        text = if (suggestion.isRestDay) "REST DAY" else suggestion.dayName.uppercase(),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = Color.White,
                             fontWeight = FontWeight.Bold
@@ -254,30 +257,41 @@ private fun SuggestionCard(
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = "Today's Target",
+                    text = if (suggestion.isRestDay) "Time to recover" else "Today's Target",
                     style = MaterialTheme.typography.labelMedium.copy(color = TextSecondary)
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = suggestion.day.label,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    color = TextPrimary,
-                    fontWeight = FontWeight.ExtraBold
+            
+            if (suggestion.isRestDay) {
+                Text(
+                    text = "Muscle is built during rest. Take it easy and sleep well! 😴",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = TextPrimary,
+                        fontStyle = FontStyle.Italic
+                    )
                 )
-            )
-            Text(
-                text = suggestion.split.name,
-                style = MaterialTheme.typography.bodyMedium.copy(color = Accent)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.height(44.dp)
-            ) {
-                Text("Start Now  →", fontWeight = FontWeight.Bold)
+            } else {
+                Text(
+                    text = suggestion.day?.label ?: "Unknown Day",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = TextPrimary,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                )
+                Text(
+                    text = suggestion.split.name,
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Accent)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.height(44.dp)
+                ) {
+                    Text("Start Today's Workout  →", fontWeight = FontWeight.Bold)
+                }
             }
         }
     }
