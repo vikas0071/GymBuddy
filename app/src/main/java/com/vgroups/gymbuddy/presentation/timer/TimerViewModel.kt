@@ -32,7 +32,7 @@ data class TimerUiState(
     val prepSecondsLeft: Int = 0,
     val workoutComplete: Boolean = false,
     val workoutElapsedSeconds: Int = 0,
-    val restDurationSeconds: Int = 90
+    val restDurationSeconds: Int = 60
 ) {
     val currentExercise: Exercise? get() = exercises.getOrNull(currentExerciseIndex)
     val overallProgress: Float
